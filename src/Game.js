@@ -4,7 +4,8 @@ import useTracking from "./Tracking";
 
 const Game = () => {
    // const { tps, latency } = useTracking();
-   const { tps, latency, updateTPS } = useTracking();
+   //const { tps, latency, updateTPS } = useTracking();
+   const { totalTransactions, latency, updateTransactions } = useTracking();
 
     const canvasRef = useRef(null);
     const livesRef = useRef(3); // Use ref to track lives
@@ -46,11 +47,11 @@ const Game = () => {
     //     ctx.fillText(`TPS: ${tpsValue}`, 20, 60);
     // }
     
-    function GameStats({ tps, latency, lives }) {
+    function GameStats({ totalTransactions, latency, lives }) {
         return (
             <div style={{
                 position: "absolute",
-                top: "10px",
+                top: "60px",
                 left: "10px",
                 background: "rgba(255, 255, 255, 0.8)",
                 padding: "10px",
@@ -60,7 +61,7 @@ const Game = () => {
             }}>
                 <p>Lives: {lives}</p>
                 <p>Latency: {latency.toFixed(2)}ms</p>
-                <p>TPS: {tps}</p>
+                <p>Total Transactions: {totalTransactions}</p>
             </div>
         );
     }
@@ -81,7 +82,7 @@ const Game = () => {
         }, 1000); // Update stats every second
     
         return () => clearInterval(interval);
-    }, [tps, latency]); // Ensure this runs every time TPS or Latency changes
+    }, [totalTransactions, latency]); // Ensure this runs every time TPS or Latency changes
     
     
     
@@ -200,7 +201,7 @@ const Game = () => {
                         ) {
                             ballSpeedY = -ballSpeedY;
                             brick.status = 0;
-                            updateTPS();  // **TPS event for hitting a brick**
+                            updateTransactions();  // **transaction event**
                         }
                     }
                 });
@@ -277,19 +278,19 @@ const Game = () => {
             // **Detect collision with side walls**
             if (ballX + ballRadius > canvas.width || ballX - ballRadius < 0) {
                 ballSpeedX = -ballSpeedX;
-                updateTPS();  // **TPS event**
+                updateTransactions();  // **transaction event**
             }
         
             // **Detect collision with top wall**
             if (ballY - ballRadius < 0) {
                 ballSpeedY = -ballSpeedY;
-                updateTPS();  // **TPS event**
+                updateTransactions();  // **transaction event**
             } 
             // **Detect collision with bottom (paddle or lose life)**
             else if (ballY + ballRadius > canvas.height) {
                 if (ballX > paddleX && ballX < paddleX + paddleWidth) {
                     ballSpeedY = -ballSpeedY;
-                    updateTPS();  // **TPS event**
+                    updateTransactions();  // **transaction event**
                 } else {
                     loseLife();
                 }
@@ -315,7 +316,7 @@ const Game = () => {
         };
     }, [gameOver, bricks]);
 
-    console.log("TPS:", tps, "Latency:", latency);
+    console.log("totalTransactions:", totalTransactions, "Latency:", latency);
 
     return (
         <>
@@ -323,7 +324,7 @@ const Game = () => {
                 ref={canvasRef}
                 style={{ background: "#eee", display: "block", margin: "auto" }}
             />
-            <GameStats tps={tps} latency={latency} lives={livesRef.current} />
+            <GameStats totalTransactions={totalTransactions} latency={latency} lives={livesRef.current} />
             {gameOver && <h2 style={{ textAlign: "center" }}>Game Over!</h2>}
         </>
     );
