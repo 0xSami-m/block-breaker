@@ -1,5 +1,6 @@
 import React, { useEffect, useRef, useState } from "react";
 import useTracking from "./Tracking";
+import LatencyGraph from "./LatencyGraph";
 
 
 const Game = () => {
@@ -325,8 +326,24 @@ const Game = () => {
                 style={{ background: "#eee", display: "block", margin: "auto" }}
             />
             <GameStats totalTransactions={totalTransactions} latency={latency} lives={livesRef.current} />
+            <LatencyGraph latency={latency} /> 
             {gameOver && <h2 style={{ textAlign: "center" }}>Game Over!</h2>}
         </>
+
+    //     <>
+    //     <div style={{
+    //         position: "relative",
+    //         width: "800px",
+    //         height: "600px", // Ensure enough space for the graph
+    //         margin: "auto",
+    //         overflow: "hidden"
+    //     }}>
+    //         <canvas ref={canvasRef} style={{ background: "#eee", display: "block" }} />
+    //         <GameStats totalTransactions={totalTransactions} latency={latency} lives={livesRef.current} />
+    //         <LatencyGraph latency={latency} /> {/* This is now fixed in position */}
+    //         {gameOver && <h2 style={{ textAlign: "center" }}>Game Over!</h2>}
+    //     </div>
+    // </>
     );
     
 };
