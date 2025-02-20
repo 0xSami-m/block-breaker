@@ -1,89 +1,40 @@
-// import { useState, useEffect } from "react";
+// with delay 
+// import { useEffect, useRef } from "react";
 
-// const useControls = () => {
-//     const [rightPressed, setRightPressed] = useState(false);
-//     const [leftPressed, setLeftPressed] = useState(false);
-
-//     useEffect(() => {
-//         const keyDownHandler = (event) => {
-//             if (event.key === "Right" || event.key === "ArrowRight") {
-//                 setRightPressed(true);
-//             } else if (event.key === "Left" || event.key === "ArrowLeft") {
-//                 setLeftPressed(true);
-//             }
-//         };
-
-//         const keyUpHandler = (event) => {
-//             if (event.key === "Right" || event.key === "ArrowRight") {
-//                 setRightPressed(false);
-//             } else if (event.key === "Left" || event.key === "ArrowLeft") {
-//                 setLeftPressed(false);
-//             }
-//         };
-
-//         document.addEventListener("keydown", keyDownHandler);
-//         document.addEventListener("keyup", keyUpHandler);
-
-//         return () => {
-//             document.removeEventListener("keydown", keyDownHandler);
-//             document.removeEventListener("keyup", keyUpHandler);
-//         };
-//     }, []);
-
-//     return { rightPressed, leftPressed };
-// };
-
-// export default useControls;
-
-
-//V3
-// import { useState, useEffect } from "react";
-
-// const useControls = (canvasWidth, paddleWidth) => {
-//     const [paddleX, setPaddleX] = useState((canvasWidth - paddleWidth) / 2);
-//     const [rightPressed, setRightPressed] = useState(false);
-//     const [leftPressed, setLeftPressed] = useState(false);
+// const useControls = (canvasWidth, paddleWidth, logPaddleMovement) => {
+//     const paddleX = useRef((canvasWidth - paddleWidth) / 2);
+//     const isWaitingForReceipt = useRef(false);
 
 //     useEffect(() => {
-//         const keyDownHandler = (event) => {
-//             if (event.key === "Right" || event.key === "ArrowRight") {
-//                 setRightPressed(true);
-//             } else if (event.key === "Left" || event.key === "ArrowLeft") {
-//                 setLeftPressed(true);
+//         const handleKeyDown = (event) => {
+//             if (event.key === "ArrowRight" || event.key === "ArrowLeft") {
+//                 if (isWaitingForReceipt.current) return; // Prevent movement if waiting for receipt
+                
+//                 isWaitingForReceipt.current = true; // Block further input
+                
+//                 logPaddleMovement(event.key, () => {
+//                     updatePaddlePosition(event.key);
+//                     isWaitingForReceipt.current = false; // Allow movement after receipt
+//                 });
 //             }
 //         };
 
-//         const keyUpHandler = (event) => {
-//             if (event.key === "Right" || event.key === "ArrowRight") {
-//                 setRightPressed(false);
-//             } else if (event.key === "Left" || event.key === "ArrowLeft") {
-//                 setLeftPressed(false);
-//             }
-//         };
+//         document.addEventListener("keydown", handleKeyDown);
+//         return () => document.removeEventListener("keydown", handleKeyDown);
+//     }, [logPaddleMovement]);
 
-//         document.addEventListener("keydown", keyDownHandler);
-//         document.addEventListener("keyup", keyUpHandler);
-
-//         return () => {
-//             document.removeEventListener("keydown", keyDownHandler);
-//             document.removeEventListener("keyup", keyUpHandler);
-//         };
-//     }, []);
-
-//     useEffect(() => {
-//         if (rightPressed && paddleX < canvasWidth - paddleWidth) {
-//             setPaddleX((prevX) => prevX + 5);
-//         } else if (leftPressed && paddleX > 0) {
-//             setPaddleX((prevX) => prevX - 5);
+//     const updatePaddlePosition = (direction) => {
+//         if (direction === "ArrowRight" && paddleX.current < canvasWidth - paddleWidth) {
+//             paddleX.current += 5;
+//         } else if (direction === "ArrowLeft" && paddleX.current > 0) {
+//             paddleX.current -= 5;
 //         }
-//     }, [rightPressed, leftPressed, paddleX, canvasWidth, paddleWidth]);
+//     };
 
-//     return paddleX;
+//     return { paddleX, updatePaddlePosition };
 // };
 
 // export default useControls;
-
-
 
 import { useEffect, useRef } from "react";
 
