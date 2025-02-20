@@ -1,3 +1,6 @@
+import { checkBrickCollision } from "./Collision";
+
+
 import { CANVAS_WIDTH, CANVAS_HEIGHT, PADDLE_WIDTH } from "./Constants";
 import { initializeBricks, LEVELS } from "./Levels";
 
@@ -38,3 +41,19 @@ export function advanceLevel(currentLevelIndex, setLevelIndex, setBricks, resetB
         window.location.reload(); // ✅ Restart the game after winning
     }
 }
+
+export function setLatencyControlledInput(updatePaddlePosition, latency) {
+    setInterval(() => {
+        updatePaddlePosition();
+    }, latency);  // ✅ Ensures movement updates every `latency` ms
+}
+
+export function setLatencyControlledCollision(ballX, ballY, ballSpeedX, ballSpeedY, bricks, levelConfig, updateTransactions, latency) {
+    setInterval(() => {
+        ballSpeedY.current = checkBrickCollision(
+            ballX.current, ballY.current, ballSpeedY.current, 
+            bricks, levelConfig.width, levelConfig.height, updateTransactions
+        );
+    }, latency); // ✅ Ensures collisions are checked every `latency` ms
+}
+
