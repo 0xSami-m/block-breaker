@@ -588,3 +588,993 @@ const Game = () => {
 };
 
 export default Game;
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+///////////////////////////////////////////////////
+
+
+
+// import React, { useEffect, useRef, useState } from "react";
+// import useTracking from "./Tracking";
+// import LatencyGraph from "./LatencyGraph";
+// import { drawBall, drawPaddle, drawBricks } from "./Render";
+// import GameStats from "./GameStats";
+// import useControls from "./useControls";
+// import { checkBrickCollision, checkWallCollision, checkPaddleCollision } from "./Collision";
+// import { initializeBricks, LEVELS } from "./Levels";
+// import { resetGame, loseLife, nextLevel } from "./GameLogic";
+// import { 
+//     CANVAS_WIDTH, CANVAS_HEIGHT, PADDLE_WIDTH, PADDLE_HEIGHT, BALL_RADIUS
+// } from "./Constants";
+
+
+// const Game = () => {
+//     const { totalTransactions, latency, updateTransactions } = useTracking();
+//     const canvasRef = useRef(null);
+//     const livesRef = useRef(3); // Use ref to track lives
+//     const [gameOver, setGameOver] = useState(false);
+//     const [currentLevel, setCurrentLevel] = useState(0);
+//     const [bricks, setBricks] = useState(() => initializeBricks(0));
+//     const brickWidth = 75;
+//     const brickHeight = 20;
+ 
+//     const paddleWidth = 100;
+//     const paddleHeight = 10;
+//     const canvasWidth = 800;
+//     const canvasHeight = 500;
+
+
+//     const ballX = useRef(CANVAS_WIDTH / 2);
+//     const ballY = useRef(CANVAS_HEIGHT - 30);
+//     const ballSpeedX = useRef(2);
+//     const ballSpeedY = useRef(-2);
+
+//     const { paddleX, updatePaddlePosition } = useControls(canvasWidth, paddleWidth);
+
+    
+//     useEffect(() => {
+//         if (!canvasRef.current) return; // Prevent running if canvas is not ready
+    
+//         const interval = setInterval(() => {
+//             const canvas = canvasRef.current;
+//             const ctx = canvas.getContext("2d");
+    
+//             ctx.clearRect(0, 0, 200, 80); // Clear only the stats area
+//         }, 1000); // Update stats every second
+    
+//         return () => clearInterval(interval);
+//     }, [totalTransactions, latency]); // Ensure this runs every time TPS or Latency changes
+    
+    
+
+//     useEffect(() => {
+//         const canvas = canvasRef.current;
+//         const ctx = canvas.getContext("2d");
+
+//         canvas.width = 800;
+//         canvas.height = 500;
+
+//         // let ballX = canvas.width / 2;
+//         // let ballY = canvas.height - 30;
+//         // let ballSpeedX = 2;
+//         // let ballSpeedY = -2;
+
+
+
+//         let ballRadius = 10;
+
+
+//         // function resetBallAndPaddle() {
+//         //     ballX = canvas.width / 2;
+//         //     ballY = canvas.height - 30;
+//         //     ballSpeedX = 2;
+//         //     ballSpeedY = -2;
+//         //    paddleX.current = (canvas.width - paddleWidth)
+//         // }
+
+//         function resetBallAndPaddle() {
+//             ballX.current = CANVAS_WIDTH / 2;
+//             ballY.current = CANVAS_HEIGHT - 30;
+//             ballSpeedX.current = 2;
+//             ballSpeedY.current = -2;
+//             paddleX.current = (CANVAS_WIDTH - PADDLE_WIDTH);
+//         }
+        
+        
+    
+
+//         function loseLife() {
+//             if (livesRef.current > 1) {
+//                 livesRef.current -= 1;
+//                 resetBallAndPaddle();
+//             } else {
+//                 setGameOver(true);
+//                 setTimeout(() => alert("Game Over!"), 100);
+//             }
+//         }
+
+
+//         function updateGame() {
+//             if (gameOver) return;
+        
+//             ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+//             //drawBricks(ctx, bricks, brickWidth, brickHeight, brickPadding, brickOffsetLeft, brickOffsetTop);
+//             drawBricks(ctx, bricks, LEVELS[currentLevel].width, LEVELS[currentLevel].height, LEVELS[currentLevel].padding, LEVELS[currentLevel].offsetLeft, LEVELS[currentLevel].offsetTop);
+
+//             //drawBall(ctx, ballX, ballY, ballRadius);
+//             drawBall(ctx, ballX.current, ballY.current, ballRadius);
+
+//             drawPaddle(ctx, paddleX.current, canvas.height, paddleWidth, paddleHeight);
+
+//             // ballSpeedY = checkBrickCollision(ballX, ballY, ballSpeedY, bricks, brickWidth, brickHeight, updateTransactions);
+//             // const wallCollision = checkWallCollision(ballX, ballY, ballRadius, ballSpeedX, ballSpeedY, canvasWidth, canvasHeight, updateTransactions);
+//             // ballSpeedX = wallCollision.newBallSpeedX;
+//             // ballSpeedY = wallCollision.newBallSpeedY;
+
+//             ballSpeedY.current = checkBrickCollision(ballX.current, ballY.current, ballSpeedY.current, bricks, brickWidth, brickHeight, updateTransactions);
+//             const wallCollision = checkWallCollision(ballX.current, ballY.current, ballRadius, ballSpeedX.current, ballSpeedY.current, canvasWidth, canvasHeight, updateTransactions);
+//             ballSpeedX.current = wallCollision.newBallSpeedX;
+//             ballSpeedY.current = wallCollision.newBallSpeedY;
+
+
+//             // const paddleCollision = checkPaddleCollision(ballX, ballY, ballRadius, ballSpeedY, paddleX, paddleWidth, canvasHeight, updateTransactions);
+//             // ballSpeedY = paddleCollision.newBallSpeedY;
+
+//             const paddleCollision = checkPaddleCollision(
+//                 ballX.current, ballY.current, ballRadius, ballSpeedY.current, paddleX.current, paddleWidth, canvasHeight, updateTransactions
+//             );
+//             ballSpeedY.current = paddleCollision.newBallSpeedY;
+            
+//             if (paddleCollision.lostLife) {
+//               loseLife();
+//             }
+
+
+//             updatePaddlePosition(); 
+
+//             const allBricksCleared = bricks.every(column => column.every(brick => brick.status === 0));
+//             if (allBricksCleared) {
+//                 nextLevel(currentLevel, setCurrentLevel, setBricks, () => 
+//                 resetGame(ballX, ballY, ballSpeedX, ballSpeedY, paddleX, currentLevel, setBricks)
+//             );
+//                        return;
+//             }
+        
+
+//             // ballX += ballSpeedX;
+//             // ballY += ballSpeedY;
+
+//             ballX.current += ballSpeedX.current;
+//             ballY.current += ballSpeedY.current;
+
+        
+        
+//             requestAnimationFrame(updateGame);
+//         }
+        
+
+//         updateGame();
+
+//    // }, [gameOver, bricks]);
+// }, [gameOver, bricks, currentLevel, paddleX, updatePaddlePosition, updateTransactions]);
+
+
+//     console.log("totalTransactions:", totalTransactions, "Latency:", latency);
+
+//     return (
+//         <>
+//             <canvas
+//                 ref={canvasRef}
+//                 style={{ background: "#eee", display: "block", margin: "auto" }}
+//             />
+//             <GameStats totalTransactions={totalTransactions} latency={latency} lives={livesRef.current} />
+//             <LatencyGraph latency={latency} /> 
+//             {gameOver && <h2 style={{ textAlign: "center" }}>Game Over!</h2>}
+//         </>
+//     );
+    
+// };
+
+// export default Game;
+
+// import React, { useEffect, useRef, useState } from "react";
+// import useTracking from "./Tracking";
+// import LatencyGraph from "./LatencyGraph";
+// import { drawBall, drawPaddle, drawBricks } from "./Render";
+// import GameStats from "./GameStats";
+// import useControls from "./useControls";
+// import { checkBrickCollision, checkWallCollision, checkPaddleCollision } from "./Collision";
+// import { initializeBricks } from "./Levels";
+// import { resetBallAndPaddle, loseLife, nextLevel } from "./GameState";
+// import {
+//     CANVAS_WIDTH, CANVAS_HEIGHT, PADDLE_WIDTH, PADDLE_HEIGHT, BALL_RADIUS, BRICK_WIDTH, BRICK_HEIGHT, BRICK_PADDING, BRICK_OFFSET_TOP, BRICK_OFFSET_LEFT
+// } from "./Constants";
+
+
+
+// const Game = () => {
+//     const { totalTransactions, latency, updateTransactions } = useTracking();
+//     const canvasRef = useRef(null);
+//     const livesRef = useRef(3); // Use ref to track lives
+//     const [gameOver, setGameOver] = useState(false);
+//     const [currentLevel, setCurrentLevel] = useState(0);
+//     const [bricks, setBricks] = useState(() => initializeBricks(0));
+
+//     // const brickRowCount = 5;
+//     // const brickColumnCount = 8;
+//     // const brickWidth = 75;
+//     // const brickHeight = 20;
+//     // const brickPadding = 10;
+//     // const brickOffsetTop = 30;
+//     // const brickOffsetLeft = 30;
+
+
+//     // const [bricks] = useState(() => {
+//     //     let brickArray = [];
+//     //     for (let c = 0; c < brickColumnCount; c++) {
+//     //         brickArray[c] = [];
+//     //         for (let r = 0; r < brickRowCount; r++) {
+//     //             brickArray[c][r] = { x: 0, y: 0, status: 1 };
+//     //         }
+//     //     }
+//     //     return brickArray;
+//     // });
+
+//     // const paddleWidth = 100;
+//     // const paddleHeight = 10;
+//     // const canvasWidth = 800;
+//     // const canvasHeight = 500;
+
+//     const ballX = useRef(CANVAS_WIDTH / 2);
+//     const ballY = useRef(CANVAS_HEIGHT - 30);
+//     const ballSpeedX = useRef(2);
+//     const ballSpeedY = useRef(-2);
+
+//     const { paddleX, updatePaddlePosition } = useControls(CANVAS_WIDTH, PADDLE_WIDTH);
+
+    
+//     useEffect(() => {
+//         if (!canvasRef.current) return; // Prevent running if canvas is not ready
+    
+//         const interval = setInterval(() => {
+//             const canvas = canvasRef.current;
+//             const ctx = canvas.getContext("2d");
+
+//             canvas.width = CANVAS_WIDTH; // **Explicitly set canvas size**
+//             canvas.height = CANVAS_HEIGHT;
+    
+//             ctx.clearRect(0, 0, 200, 80); // Clear only the stats area
+//         }, 1000); // Update stats every second
+    
+//         return () => clearInterval(interval);
+//     }, [totalTransactions, latency]); // Ensure this runs every time TPS or Latency changes
+    
+    
+
+//     useEffect(() => {
+//         const canvas = canvasRef.current;
+//         const ctx = canvas.getContext("2d");
+
+//        // canvas.width = 800;
+//        // canvas.height = 500;
+
+//         // let ballX = canvas.width / 2;
+//         // let ballY = canvas.height - 30;
+//         // let ballSpeedX = 2;
+//         // let ballSpeedY = -2;
+//         // let ballRadius = 10;
+
+
+//         // function resetBallAndPaddle() {
+//         //     ballX = canvas.width / 2;
+//         //     ballY = canvas.height - 30;
+//         //     ballSpeedX = 2;
+//         //     ballSpeedY = -2;
+//         //    paddleX.current = (canvas.width - paddleWidth)
+//         // }
+    
+
+//         // function loseLife() {
+//         //     if (livesRef.current > 1) {
+//         //         livesRef.current -= 1;
+//         //         resetBallAndPaddle();
+//         //     } else {
+//         //         setGameOver(true);
+//         //         setTimeout(() => alert("Game Over!"), 100);
+//         //     }
+//         // }
+
+
+//         function updateGame() {
+//             if (gameOver) return;
+        
+//             ctx.clearRect(0, 0, CANVAS_WIDTH, CANVAS_HEIGHT);
+
+//             // drawBricks(ctx, bricks, brickWidth, brickHeight, brickPadding, brickOffsetLeft, brickOffsetTop);
+//             // drawBall(ctx, ballX, ballY, ballRadius);
+//             // drawPaddle(ctx, paddleX.current, canvas.height, paddleWidth, paddleHeight);
+
+//             drawBricks(ctx, bricks, BRICK_WIDTH, BRICK_HEIGHT, BRICK_PADDING, BRICK_OFFSET_LEFT, BRICK_OFFSET_TOP);
+//             drawBall(ctx, ballX.current, ballY.current, BALL_RADIUS);
+//             drawPaddle(ctx, paddleX.current, CANVAS_HEIGHT, PADDLE_WIDTH, PADDLE_HEIGHT);
+
+//     //         ballSpeedY = checkBrickCollision(ballX, ballY, ballSpeedY, bricks, brickWidth, brickHeight, updateTransactions);
+//     //         const wallCollision = checkWallCollision(ballX, ballY, ballRadius, ballSpeedX, ballSpeedY, canvasWidth, canvasHeight, updateTransactions);
+//     //         ballSpeedX = wallCollision.newBallSpeedX;
+//     //         ballSpeedY = wallCollision.newBallSpeedY;
+
+//     //         const paddleCollision = checkPaddleCollision(ballX, ballY, ballRadius, ballSpeedY, paddleX, paddleWidth, canvasHeight, updateTransactions);
+//     //         ballSpeedY = paddleCollision.newBallSpeedY;
+//     //         if (paddleCollision.lostLife) {
+//     //           loseLife();
+//     //         }
+
+
+//     //         updatePaddlePosition(); 
+        
+
+//     //         ballX += ballSpeedX;
+//     //         ballY += ballSpeedY;
+        
+        
+//     //         requestAnimationFrame(updateGame);
+//     //     }
+        
+
+//     //     updateGame();
+
+//     // }, [gameOver, bricks]);
+
+//     ballSpeedY.current = checkBrickCollision(ballX.current, ballY.current, ballSpeedY.current, bricks, BRICK_WIDTH, BRICK_HEIGHT, updateTransactions);
+
+//     const wallCollision = checkWallCollision(
+//         ballX.current, ballY.current, BALL_RADIUS, ballSpeedX.current, ballSpeedY.current, CANVAS_WIDTH, CANVAS_HEIGHT, updateTransactions
+//     );
+//     ballSpeedX.current = wallCollision.newBallSpeedX;
+//     ballSpeedY.current = wallCollision.newBallSpeedY;
+
+//     const paddleCollision = checkPaddleCollision(
+//         ballX.current, ballY.current, BALL_RADIUS, ballSpeedY.current, paddleX, PADDLE_WIDTH, CANVAS_HEIGHT, updateTransactions
+//     );
+//     ballSpeedY.current = paddleCollision.newBallSpeedY;
+//     if (paddleCollision.lostLife) {
+//         loseLife(livesRef, () => resetBallAndPaddle(ballX, ballY, ballSpeedX, ballSpeedY, paddleX), setGameOver);
+//     }
+
+//     updatePaddlePosition();
+
+//     ballX.current += ballSpeedX.current;
+//     ballY.current += ballSpeedY.current;
+
+//     // **🟢 Check if all bricks are cleared before moving to the next level**
+//     const allBricksCleared = bricks.every(column => column.every(brick => brick.status === 0));
+//     if (allBricksCleared) {
+//         nextLevel(currentLevel, setCurrentLevel, setBricks, () => resetBallAndPaddle(ballX, ballY, ballSpeedX, ballSpeedY, paddleX));
+//         return;
+//     }
+
+//     requestAnimationFrame(updateGame);
+// }
+//     updateGame();
+
+// //requestAnimationFrame(updateGame);
+
+// }, [gameOver, bricks, currentLevel, paddleX, updatePaddlePosition, updateTransactions]);
+
+
+//     console.log("totalTransactions:", totalTransactions, "Latency:", latency);
+
+//     return (
+//         <>
+//             <canvas
+//                 ref={canvasRef}
+//                 style={{ background: "#eee", display: "block", margin: "auto" }}
+//             />
+//             <GameStats totalTransactions={totalTransactions} latency={latency} lives={livesRef.current} />
+//             <LatencyGraph latency={latency} /> 
+//             {gameOver && <h2 style={{ textAlign: "center" }}>Game Over!</h2>}
+//         </>
+//     );
+    
+// };
+
+// export default Game;
+
+
+// import React, { useEffect, useRef, useState } from "react";
+// import useTracking from "./Tracking";
+// import LatencyGraph from "./LatencyGraph";
+// import { drawBall, drawPaddle, drawBricks } from "./Render";
+// import GameStats from "./GameStats";
+// import useControls from "./useControls";
+// import { checkBrickCollision, checkWallCollision, checkPaddleCollision } from "./Collision";
+// import { 
+//     CANVAS_WIDTH, CANVAS_HEIGHT, PADDLE_WIDTH, PADDLE_HEIGHT, BALL_RADIUS, BALL_SPEED_X, BALL_SPEED_Y, 
+//     BRICK_ROW_COUNT, BRICK_COLUMN_COUNT, BRICK_WIDTH, BRICK_HEIGHT, BRICK_PADDING, BRICK_OFFSET_TOP,
+//     BRICK_OFFSET_LEFT 
+// } from "./Constants";
+
+
+
+// const Game = () => {
+
+//     const { totalTransactions, latency, updateTransactions } = useTracking();
+//     const canvasRef = useRef(null);
+//     const livesRef = useRef(3); // Use ref to track lives
+//     const [gameOver, setGameOver] = useState(false);
+//     // const brickRowCount = 5;
+//     // const brickColumnCount = 8;
+//     // const brickWidth = 75;
+//     // const brickHeight = 20;
+//     // const brickPadding = 10;
+//     // const brickOffsetTop = 30;
+//     // const brickOffsetLeft = 30;
+
+//     const [bricks] = useState(() => {
+//         let brickArray = [];
+//         for (let c = 0; c < BRICK_COLUMN_COUNT; c++) {
+//             brickArray[c] = [];
+//             for (let r = 0; r < BRICK_ROW_COUNT; r++) {
+//                 brickArray[c][r] = { x: 0, y: 0, status: 1 };
+//             }
+//         }
+//         return brickArray;
+//     });
+
+//     // const paddleWidth = 100;
+//     // const paddleHeight = 10;
+//     // const canvasWidth = 800;
+//     // const canvasHeight = 500;
+
+//     const { paddleX, updatePaddlePosition } = useControls(CANVAS_WIDTH, PADDLE_WIDTH);
+
+    
+//     useEffect(() => {
+//         if (!canvasRef.current) return; // Prevent running if canvas is not ready
+    
+//         const interval = setInterval(() => {
+//             const canvas = canvasRef.current;
+//             const ctx = canvas.getContext("2d");
+    
+//             ctx.clearRect(0, 0, 200, 80); // Clear only the stats area
+//         }, 1000); // Update stats every second
+    
+//         return () => clearInterval(interval);
+//     }, [totalTransactions, latency]); // Ensure this runs every time TPS or Latency changes
+    
+    
+
+//     useEffect(() => {
+//         const canvas = canvasRef.current;
+//         const ctx = canvas.getContext("2d");
+
+//         // canvas.width = CANVAS_WIDTH;
+//         // canvas.height = CANVAS_HEIGHT;
+
+//         let ballX = CANVAS_WIDTH / 2;
+//         let ballY = CANVAS_HEIGHT - 30;
+//         //let ballSpeedX = 2;
+//         //let ballSpeedY = -2;
+//         //let ballRadius = 10;
+
+
+//         function resetBallAndPaddle() {
+//             ballX = CANVAS_WIDTH / 2;
+//             ballY = CANVAS_HEIGHT - 30;
+//             // ballSpeedX = 2;
+//             // ballSpeedY = -2;
+//            paddleX.current = (CANVAS_WIDTH - PADDLE_WIDTH)
+//         }
+    
+
+//         function loseLife() {
+//             if (livesRef.current > 1) {
+//                 livesRef.current -= 1;
+//                 resetBallAndPaddle();
+//             } else {
+//                 setGameOver(true);
+//                 setTimeout(() => alert("Game Over!"), 100);
+//             }
+//         }
+
+
+//         function updateGame() {
+//             if (gameOver) return;
+        
+//             ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+//             drawBricks(ctx, bricks, BRICK_WIDTH, BRICK_HEIGHT, BRICK_PADDING, BRICK_OFFSET_LEFT, BRICK_OFFSET_TOP);
+//             drawBall(ctx, ballX, ballY, BALL_RADIUS);
+//             drawPaddle(ctx, paddleX.current, CANVAS_HEIGHT, PADDLE_WIDTH, PADDLE_HEIGHT);
+
+//             let ballSpeedX = BALL_SPEED_X;  // Define local ball speed variables
+//             let ballSpeedY = BALL_SPEED_Y;
+
+//             ballSpeedY = checkBrickCollision(ballX, ballY, ballSpeedY, bricks, BRICK_WIDTH, BRICK_HEIGHT, updateTransactions);
+//             const wallCollision = checkWallCollision(
+//                 ballX, ballY, BALL_RADIUS, ballSpeedX, ballSpeedY, CANVAS_WIDTH, CANVAS_HEIGHT, updateTransactions
+//             );
+            
+//             ballSpeedX = wallCollision.newBallSpeedX;
+//             ballSpeedY = wallCollision.newBallSpeedY;
+
+//             // const paddleCollision = checkPaddleCollision(ballX, ballY, ballRadius, ballSpeedY, paddleX, paddleWidth, canvasHeight, updateTransactions);
+//             const paddleCollision = checkPaddleCollision(ballX, ballY, BALL_RADIUS, ballSpeedY, paddleX, PADDLE_WIDTH, CANVAS_HEIGHT, updateTransactions);
+
+//             ballSpeedY = paddleCollision.newBallSpeedY;
+//             if (paddleCollision.lostLife) {
+//               loseLife();
+//             }
+
+
+//             updatePaddlePosition(); 
+        
+
+//             ballX += ballSpeedX;
+//             ballY += ballSpeedY;
+        
+        
+//             requestAnimationFrame(updateGame);
+//         }
+        
+//         requestAnimationFrame(updateGame);
+
+//        //  updateGame();
+
+//     }, [gameOver, bricks, paddleX, updatePaddlePosition, updateTransactions]); 
+
+//     console.log("totalTransactions:", totalTransactions, "Latency:", latency);
+
+//     return (
+//         <>
+//             <canvas
+//                 ref={canvasRef}
+//                 style={{ background: "#eee", display: "block", margin: "auto" }}
+//             />
+//             <GameStats totalTransactions={totalTransactions} latency={latency} lives={livesRef.current} />
+//             <LatencyGraph latency={latency} /> 
+//             {gameOver && <h2 style={{ textAlign: "center" }}>Game Over!</h2>}
+//         </>
+//     );
+    
+// };
+
+// export default Game;
+
+
+
+// import React, { useEffect, useRef, useState } from "react";
+// import useTracking from "./Tracking";
+// import LatencyGraph from "./LatencyGraph";
+// import { drawBall, drawPaddle, drawBricks } from "./Render";
+// import GameStats from "./GameStats";
+// import useControls from "./useControls";
+// import { checkBrickCollision, checkWallCollision, checkPaddleCollision } from "./Collision";
+// import { 
+//     CANVAS_WIDTH, CANVAS_HEIGHT, PADDLE_WIDTH, PADDLE_HEIGHT, BALL_RADIUS, BALL_SPEED_X, BALL_SPEED_Y, 
+//     BRICK_ROW_COUNT, BRICK_COLUMN_COUNT, BRICK_WIDTH, BRICK_HEIGHT, BRICK_PADDING, BRICK_OFFSET_TOP,
+//     BRICK_OFFSET_LEFT 
+// } from "./Constants";
+
+// const Game = () => {
+//     const { totalTransactions, latency, updateTransactions } = useTracking();
+//     const canvasRef = useRef(null);
+//     const livesRef = useRef(3);
+//     const [gameOver, setGameOver] = useState(false);
+
+//     // 🟢 Use useRef for ball position and speed to persist values across frames
+//     const ballX = useRef(CANVAS_WIDTH / 2);
+//     const ballY = useRef(CANVAS_HEIGHT - 30);
+//     const ballSpeedX = useRef(BALL_SPEED_X);
+//     const ballSpeedY = useRef(BALL_SPEED_Y);
+
+//     const [bricks] = useState(() => {
+//         let brickArray = [];
+//         for (let c = 0; c < BRICK_COLUMN_COUNT; c++) {
+//             brickArray[c] = [];
+//             for (let r = 0; r < BRICK_ROW_COUNT; r++) {
+//                 brickArray[c][r] = { x: 0, y: 0, status: 1 };
+//             }
+//         }
+//         return brickArray;
+//     });
+
+//     const { paddleX, updatePaddlePosition } = useControls(CANVAS_WIDTH, PADDLE_WIDTH);
+
+//     useEffect(() => {
+//         if (!canvasRef.current) return;
+    
+//         const interval = setInterval(() => {
+//             const canvas = canvasRef.current;
+//             const ctx = canvas.getContext("2d");
+//             ctx.clearRect(0, 0, 200, 80);
+//         }, 1000);
+
+//         return () => clearInterval(interval);
+//     }, [totalTransactions, latency]);
+
+//     useEffect(() => {
+//         const canvas = canvasRef.current;
+//         const ctx = canvas.getContext("2d");
+
+//         function resetBallAndPaddle() {
+//             ballX.current = CANVAS_WIDTH / 2;
+//             ballY.current = CANVAS_HEIGHT - 30;
+//             ballSpeedX.current = BALL_SPEED_X;
+//             ballSpeedY.current = BALL_SPEED_Y;
+//             paddleX.current = (CANVAS_WIDTH - PADDLE_WIDTH);
+//         }
+
+//         function loseLife() {
+//             if (livesRef.current > 1) {
+//                 livesRef.current -= 1;
+//                 resetBallAndPaddle();
+//             } else {
+//                 setGameOver(true);
+//                 setTimeout(() => alert("Game Over!"), 100);
+//             }
+//         }
+
+//         function updateGame() {
+//             if (gameOver) return;
+
+//             ctx.clearRect(0, 0, CANVAS_WIDTH, CANVAS_HEIGHT);
+
+//             drawBricks(ctx, bricks, BRICK_WIDTH, BRICK_HEIGHT, BRICK_PADDING, BRICK_OFFSET_LEFT, BRICK_OFFSET_TOP);
+//             drawBall(ctx, ballX.current, ballY.current, BALL_RADIUS);
+//             drawPaddle(ctx, paddleX.current, CANVAS_HEIGHT, PADDLE_WIDTH, PADDLE_HEIGHT);
+
+//             // 🟢 Correctly update speed using refs (persists across frames)
+//             ballSpeedY.current = checkBrickCollision(
+//                 ballX.current, ballY.current, ballSpeedY.current, bricks, BRICK_WIDTH, BRICK_HEIGHT, updateTransactions
+//             );
+
+//             const wallCollision = checkWallCollision(
+//                 ballX.current, ballY.current, BALL_RADIUS, ballSpeedX.current, ballSpeedY.current, CANVAS_WIDTH, CANVAS_HEIGHT, updateTransactions
+//             );
+//             ballSpeedX.current = wallCollision.newBallSpeedX;
+//             ballSpeedY.current = wallCollision.newBallSpeedY;
+
+//             const paddleCollision = checkPaddleCollision(
+//                 ballX.current, ballY.current, BALL_RADIUS, ballSpeedY.current, paddleX, PADDLE_WIDTH, CANVAS_HEIGHT, updateTransactions
+//             );
+
+//             ballSpeedY.current = paddleCollision.newBallSpeedY;
+//             if (paddleCollision.lostLife) {
+//                 loseLife();
+//             }
+
+//             updatePaddlePosition();
+
+//             // 🟢 Persist ball movement across frames
+//             ballX.current += ballSpeedX.current;
+//             ballY.current += ballSpeedY.current;
+
+//             requestAnimationFrame(updateGame);
+//         }
+
+//         requestAnimationFrame(updateGame);
+    
+//     }, [gameOver, bricks, paddleX, updatePaddlePosition, updateTransactions]);
+
+//     return (
+//         <>
+//             <canvas
+//                 ref={canvasRef}
+//                 width={CANVAS_WIDTH}
+//                 height={CANVAS_HEIGHT}
+//                 style={{ background: "#eee", display: "block", margin: "auto" }}
+//             />
+//             <GameStats totalTransactions={totalTransactions} latency={latency} lives={livesRef.current} />
+//             <LatencyGraph latency={latency} />
+//             {gameOver && <h2 style={{ textAlign: "center" }}>Game Over!</h2>}
+//         </>
+//     );
+// };
+
+// export default Game;
+
+
+
+
+// import React, { useEffect, useRef, useState } from "react";
+// import useTracking from "./Tracking";
+// import LatencyGraph from "./LatencyGraph";
+// import { drawBall, drawPaddle, drawBricks } from "./Render";
+// import GameStats from "./GameStats";
+// import useControls from "./useControls";
+// import { initializeBricks, handleGameLogic } from "./GameLogic";
+
+
+
+// const Game = () => {
+
+//    const { totalTransactions, latency, updateTransactions } = useTracking();
+//     const canvasRef = useRef(null);
+//     const livesRef = useRef(3); // Use ref to track lives
+//     const [gameOver, setGameOver] = useState(false);
+
+//     const bricks = initializeBricks();
+//     const { rightPressed, leftPressed } = useControls();
+//     // const brickRowCount = 5;
+//     // const brickColumnCount = 8;
+//     // const brickWidth = 75;
+//     // const brickHeight = 20;
+//     // const brickPadding = 10;
+//     // const brickOffsetTop = 30;
+//     // const brickOffsetLeft = 30;
+
+//     // const [bricks] = useState(() => {
+//     //     let brickArray = [];
+//     //     for (let c = 0; c < brickColumnCount; c++) {
+//     //         brickArray[c] = [];
+//     //         for (let r = 0; r < brickRowCount; r++) {
+//     //             brickArray[c][r] = { x: 0, y: 0, status: 1 };
+//     //         }
+//     //     }
+//     //     return brickArray;
+//     // });
+ 
+//     // function GameStats({ totalTransactions, latency, lives }) {
+//     //     return (
+//     //         <div style={{
+//     //             position: "absolute",
+//     //             top: "60px",
+//     //             left: "10px",
+//     //             background: "rgba(255, 255, 255, 0.8)",
+//     //             padding: "10px",
+//     //             borderRadius: "5px",
+//     //             fontSize: "16px",
+//     //             fontFamily: "Arial, sans-serif"
+//     //         }}>
+//     //             <p>Lives: {lives}</p>
+//     //             <p>Latency: {latency.toFixed(2)}ms</p>
+//     //             <p>Total Transactions: {totalTransactions}</p>
+//     //         </div>
+//     //     );
+//     // }
+
+//     useEffect(() => {
+//         if (!canvasRef.current) return; // Prevent running if canvas is not ready
+    
+//         const interval = setInterval(() => {
+//             const canvas = canvasRef.current;
+//             const ctx = canvas.getContext("2d");
+    
+//             ctx.clearRect(0, 0, 200, 80); // Clear only the stats area
+//           //  drawStats(ctx, latency, tps, livesRef, canvas.width);
+//         }, 1000); // Update stats every second
+    
+//         return () => clearInterval(interval);
+//     }, [totalTransactions, latency]); // Ensure this runs every time TPS or Latency changes
+    
+    
+    
+    
+
+//     useEffect(() => {
+//         const canvas = canvasRef.current;
+//         const ctx = canvas.getContext("2d");
+
+//         canvas.width = 800;
+//         canvas.height = 500;
+
+//         let ballX = canvas.width / 2;
+//         let ballY = canvas.height - 30;
+//         let ballSpeedX = 2;
+//         let ballSpeedY = -2;
+//         let ballRadius = 10;
+
+//         const paddleHeight = 10;
+//         const paddleWidth = 100;
+//         let paddleX = (canvas.width - paddleWidth) / 2;
+//         // let rightPressed = false;
+//         // let leftPressed = false;
+//         //const { rightPressed, leftPressed } = useControls();
+
+
+//         // document.addEventListener("keydown", keyDownHandler);
+//         // document.addEventListener("keyup", keyUpHandler);
+
+//         // function keyDownHandler(event) {
+//         //     if (event.key === "Right" || event.key === "ArrowRight") {
+//         //         rightPressed = true;
+//         //     } else if (event.key === "Left" || event.key === "ArrowLeft") {
+//         //         leftPressed = true;
+//         //     }
+//         // }
+
+//         // function keyUpHandler(event) {
+//         //     if (event.key === "Right" || event.key === "ArrowRight") {
+//         //         rightPressed = false;
+//         //     } else if (event.key === "Left" || event.key === "ArrowLeft") {
+//         //         leftPressed = false;
+//         //     }
+//         // }
+
+ 
+
+//         // function collisionDetection() {
+//         //     bricks.forEach((column) => {
+//         //         column.forEach((brick) => {
+//         //             if (brick.status === 1) {
+//         //                 if (
+//         //                     ballX > brick.x &&
+//         //                     ballX < brick.x + brickWidth &&
+//         //                     ballY > brick.y &&
+//         //                     ballY < brick.y + brickHeight
+//         //                 ) {
+//         //                     ballSpeedY = -ballSpeedY;
+//         //                     brick.status = 0;
+//         //                     updateTransactions();  // **transaction event**
+//         //                 }
+//         //             }
+//         //         });
+//         //     });
+//         // }
+        
+
+//         // function resetBallAndPaddle() {
+//         //     ballX = canvas.width / 2;
+//         //     ballY = canvas.height - 30;
+//         //     ballSpeedX = 2;
+//         //     ballSpeedY = -2;
+//         //     paddleX = (canvas.width - paddleWidth) / 2;
+//         // }
+
+//         // function loseLife() {
+//         //     if (livesRef.current > 1) {
+//         //         livesRef.current -= 1;
+//         //         //setLives(livesRef.current);
+//         //         resetBallAndPaddle();
+//         //     } else {
+//         //         setGameOver(true);
+//         //         setTimeout(() => alert("Game Over!"), 100);
+//         //     }
+//         // }
+
+
+//         function updateGame() {
+//             if (gameOver) return;
+        
+//             ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+//             drawBricks(ctx, bricks, brickWidth, brickHeight, brickPadding, brickOffsetLeft, brickOffsetTop);
+//             drawBall(ctx, ballX, ballY, ballRadius);
+//             drawPaddle(ctx, paddleX, canvas.height, paddleWidth, paddleHeight);
+
+//             collisionDetection();
+            
+//             ballX += ballSpeedX;
+//             ballY += ballSpeedY;
+        
+//             // **Detect collision with side walls**
+//             if (ballX + ballRadius > canvas.width || ballX - ballRadius < 0) {
+//                 ballSpeedX = -ballSpeedX;
+//                 updateTransactions();  // **transaction event**
+//             }
+        
+//             // **Detect collision with top wall**
+//             if (ballY - ballRadius < 0) {
+//                 ballSpeedY = -ballSpeedY;
+//                 updateTransactions();  // **transaction event**
+//             } 
+//             // **Detect collision with bottom (paddle or lose life)**
+//             else if (ballY + ballRadius > canvas.height) {
+//                 if (ballX > paddleX && ballX < paddleX + paddleWidth) {
+//                     ballSpeedY = -ballSpeedY;
+//                     updateTransactions();  // **transaction event**
+//                 } else {
+//                     loseLife();
+//                    //loseLife(livesRef, setGameOver, resetBallAndPaddle, canvas, setBallState, setPaddleX);
+//                 }
+//             }
+        
+//             // **Move paddle left or right**
+//             if (rightPressed && paddleX < canvas.width - paddleWidth) {
+//                 paddleX += 5;
+//             } else if (leftPressed && paddleX > 0) {
+//                 paddleX -= 5;
+//             }
+        
+//             requestAnimationFrame(updateGame);
+//         }
+        
+        
+
+//         updateGame();
+
+//         // return () => {
+//         //     document.removeEventListener("keydown", keyDownHandler);
+//         //     document.removeEventListener("keyup", keyUpHandler);
+//         // };
+//     }, [gameOver, bricks]);
+
+//     console.log("totalTransactions:", totalTransactions, "Latency:", latency);
+
+//     return (
+//         <>
+//             <canvas
+//                 ref={canvasRef}
+//                 style={{ background: "#eee", display: "block", margin: "auto" }}
+//             />
+//             <GameStats totalTransactions={totalTransactions} latency={latency} lives={livesRef.current} />
+//             <LatencyGraph latency={latency} /> 
+//             {gameOver && <h2 style={{ textAlign: "center" }}>Game Over!</h2>}
+//         </>
+//     );
+    
+// };
+
+// export default Game;
+
+
+//V2
+
+// import React, { useEffect, useRef, useState } from "react";
+// import useTracking from "./Tracking";
+// import LatencyGraph from "./LatencyGraph";
+// import { drawBall, drawPaddle, drawBricks } from "./Render";
+// import GameStats from "./GameStats";
+// import useControls from "./useControls";
+// import { initializeBricks, handleGameLogic } from "./GameLogic";
+
+// const Game = () => {
+//     const { totalTransactions, latency, updateTransactions } = useTracking();
+//     const canvasRef = useRef(null);
+//     const livesRef = useRef(3);
+//     const [gameOver, setGameOver] = useState(false);
+    
+//     const bricks = initializeBricks();
+//     const { rightPressed, leftPressed } = useControls();
+
+//     useEffect(() => {
+//         const canvas = canvasRef.current;
+//         if (!canvas) return;
+        
+//         const ctx = canvas.getContext("2d");
+//         canvas.width = 800;
+//         canvas.height = 500;
+        
+//         handleGameLogic({
+//             ctx,
+//             canvas,
+//             livesRef,
+//             setGameOver,
+//             gameOver,
+//             bricks,
+//             updateTransactions,
+//             rightPressed,
+//             leftPressed
+//         });
+//     }, [gameOver, rightPressed, leftPressed]);
+
+//     return (
+//         <>
+//             <canvas ref={canvasRef} style={{ background: "#eee", display: "block", margin: "auto" }} />
+//             <GameStats totalTransactions={totalTransactions} latency={latency} lives={livesRef.current} />
+//             <LatencyGraph latency={latency} />
+//             {gameOver && <h2 style={{ textAlign: "center" }}>Game Over!</h2>}
+//         </>
+//     );
+// };
+
+// export default Game;
